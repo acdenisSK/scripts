@@ -1,0 +1,67 @@
+#!/bin/sh
+
+# MIT License
+#
+# Copyright (c) 2021 Alex M. M.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+help() {
+    printf "usage: $0 [-h | --help] <input-path> <output-path>\n\n"
+    printf "Reduce file size of videos while retaining quality.\n"
+    printf "Requires \`ffmpeg\` to be installed.\n"
+}
+
+options() {
+    case "$1" in
+        -h|--help)
+            help
+            ;;
+        *)
+            printf "unknown option: $1\n"
+            help
+            ;;
+    esac
+}
+
+compress() {
+    # Taken from https://unix.stackexchange.com/a/38380
+    ffmpeg -i $1 -vcodec libx265 -crf 28 $2
+}
+
+if [ $# -eq 0 ]; then
+    printf "no arguments given\n"
+    help
+    exit
+fi
+
+case "$1" in
+    -*)
+        options "$@"
+        exit
+        ;;
+esac
+
+if [ $# -ne 2 ]; then
+    printf "amount of arguments must be exactly 2\n"
+    help
+    exit
+fi
+
+compress "$@"
